@@ -16,6 +16,7 @@
             --wamalama-color: #FFC300; /* Yellow */
             --baja-color: #2a9d8f; /* Teal */
             --swg-color: #000000; /* Black */
+            --carti-color: #8A2BE2; /* Blue Violet (Purple) for easter egg */
         }
 
         body {
@@ -81,6 +82,7 @@
         .nav-wamalama span { color: black; text-shadow: none; }
         .nav-baja { background-color: var(--baja-color); }
         .nav-swg { background-color: var(--swg-color); }
+        .nav-carti { background-color: var(--carti-color); } /* Purple color for easter egg */
 
         /* Active State Indicator (optional underline or glow) */
         .nav-item.active {
@@ -202,9 +204,10 @@
         
         <!-- Header Section -->
         <header class="bg-white py-4 border-b-4 border-black text-center relative z-10 flex justify-center">
-            <img src="https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/swglogo.png" 
+            <!-- Added id and cursor-pointer for Easter Egg trigger -->
+            <img id="logo-trigger" src="https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/swglogo.png" 
                  alt="SWG Logo" 
-                 class="h-24 object-contain">
+                 class="h-24 object-contain cursor-pointer">
         </header>
 
         <!-- Navigation Tabs (The Filter) -->
@@ -220,6 +223,10 @@
             </div>
             <div class="nav-item nav-swg" onclick="filterAlbums('swg', this)">
                 <span>SWG (group)</span>
+            </div>
+            <!-- New hidden Easter Egg item - Initially hidden with Tailwind class -->
+            <div id="carti-nav-item" class="nav-item nav-carti hidden" onclick="filterAlbums('cornerstore', this)">
+                <span>Corner$tore Carti</span>
             </div>
         </nav>
 
@@ -239,7 +246,7 @@
     <div id="album-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 p-4 opacity-0 flex items-center justify-center">
         <!-- Modal Content (New Vertical Layout) -->
         <div id="modal-content" class="bg-white p-6 rounded-lg max-w-sm w-full shadow-2xl relative" style="border: 4px solid black;">
-            <!-- Added z-20 to ensure the close button is on top of everything inside the modal -->
+            <!-- z-20 ensures the close button is on top -->
             <button onclick="closeModal()" class="absolute top-2 right-4 text-3xl font-bold text-gray-800 hover:text-red-600 transition-colors focus:outline-none z-20">&times;</button>
             
             <div class="flex flex-col gap-4 items-center">
@@ -264,16 +271,20 @@
                 </div>
                 
                 <!-- Album Info (Vertical) -->
-                <!-- Removed inline style to use the new Oswald font defined in CSS -->
                 <h2 id="modal-title" class="modal-title-style text-center font-extrabold"></h2>
                 <p id="modal-artist" class="text-lg text-gray-600 mb-4"></p>
                 
-                <div class="space-y-3 w-full mb-6">
+                <div id="link-container" class="space-y-3 w-full mb-6">
+                    <!-- Standard Links (Visible by default) -->
                     <a id="spotify-link" href="#" target="_blank" class="w-full flex items-center justify-center py-3 px-4 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition duration-150">
                         Listen on Spotify
                     </a>
                     <a id="apple-music-link" href="#" target="_blank" class="w-full flex items-center justify-center py-3 px-4 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-red-600 transition duration-150">
                         Listen on Apple Music
+                    </a>
+                    <!-- Custom Easter Egg Link (Hidden by default) -->
+                    <a id="custom-link" href="#" target="_blank" class="hidden w-full flex items-center justify-center py-3 px-4 bg-gray-300 text-black font-bold rounded-lg shadow-md hover:bg-gray-400 transition duration-150">
+                        Listen On 🗑️
                     </a>
                 </div>
 
@@ -293,6 +304,8 @@
     <script>
         // --- Constants ---
         const GIF_URL = 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/3dgifmaker81059.gif';
+        const LOGO_CLICKS_REQUIRED = 10;
+        const EASTER_EGG_LINK = 'https://untitled.stream/library/project/S3L9a4VLwC3sgKDzpV8dw';
 
         // ==========================================================
         // --- START EDITABLE ALBUM DATA ---
@@ -303,7 +316,7 @@
             { id: 1, artist: 'flow', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/REPDATSHI.jpg', title: 'Rep Dat Shit', spotifyUrl: 'https://open.spotify.com/album/3vjRPMduHYK2IqflSPBm91', appleMusicUrl: 'https://apple.com/', tracklist: ['Rep Dat Shit (feat. Baja)'] },
             { id: 2, artist: 'flow', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/RESURGENCE.jpg', title: 'The Resurgence', spotifyUrl: 'https://open.spotify.com/album/2XkJNDhzdybp0TCeLh5pFD', appleMusicUrl: 'https://apple.com/', tracklist: ['Reborn (feat. Wamalama, DDripLit, The Golden Child)', 'The Redux (feat. Baja)', 'WV GOLF (feat. Wamalama, BandoB1)', 'Serpents', 'Ski-Hi', '50/50 (feat. Wamalama, Baja)', 'Control (feat. apnp_apnu)', 'Resurgence', 'free'] },
             { id: 3, artist: 'flow', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/VWGOLF.jpg', title: 'VW GOLF', spotifyUrl: 'https://open.spotify.com/album/6n1lk9s3m6VjtQkBFSVYlK', appleMusicUrl: 'https://apple.com/', tracklist: ['VW GOLF (feat. wamalama, BandoB1)'] },
-            { id: 4, artist: 'flow', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/SNP.jpg', title: 'SOULS NEWEST PRODIGY', spotifyUrl: 'https://open.spotify.com/album/1HmD7rJdKygaaeAUFqD0Lw', appleMusicUrl: 'https://apple.com/', tracklist: ['SOULS NEWEST PRODIGY'] },
+            { id: 4, artist: 'flow', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/SNP.jpg', title: 'SOULS NEWEST PRODIGY', spotifyUrl: 'https://open.spotify.com/album/1HmD7rJdKygaaeAUFqD0Lw', appleMusicUrl: 'https://apple.com/', tracklist: ['SOULS NEWEST PRODIGY (feat. wamalama)'] },
             
             // WAMALAMA
             { id: 5, artist: 'wamalama', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/RUST.png', title: 'Rust', spotifyUrl: 'https://open.spotify.com/album/16Jil4Nga7Hv8nhXNeRZch', appleMusicUrl: 'https://apple.com/', tracklist: ['Rust (feat. Baja, flowswg)'] },
@@ -313,13 +326,19 @@
             { id: 7, artist: 'baja', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/SOWP%20concept%202.png', title: 'Straight Outta West P', spotifyUrl: 'https://spotify.com/', appleMusicUrl: 'https://apple.com/', tracklist: ['Coming Soon!'] },
             
             // SWG GROUP
-            { id: 8, artist: 'swg', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/5050.jpg', title: '50/50', spotifyUrl: 'https://open.spotify.com/album/3mVEogu5r1tfn93A63tFOo', appleMusicUrl: 'https://apple.com/', tracklist: ['50/50 (feat. wamalama, baja)'] }
+            { id: 8, artist: 'swg', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/5050.jpg', title: '50/50', spotifyUrl: 'https://open.spotify.com/album/3mVEogu5r1tfn93A63tFOo', appleMusicUrl: 'https://apple.com/', tracklist: ['50/50 (feat. wamalama, baja)'] },
+
+            // --- EASTER EGG ALBUMS (cornerstore) ---
+            { id: 9, artist: 'cornerstore', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/cornerstone_carti.jpg', title: 'Corner$tore Carti', specialLink: true, tracklist: ['Corner$tore Carti', 'Take Her Back', 'Sippin Lean (feat. C0nYe Wong & Trevis Scoot)', 'Parole'] },
+            { id: 10, artist: 'cornerstore', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/playbert.png', title: 'playbert farti', specialLink: true, tracklist: ['playbert farti (feat. Osamabinladenson, CHNA, corner$tore carti)'] },
+            { id: 11, artist: 'cornerstore', src: 'https://raw.githubusercontent.com/brickfent420/swgmusic/refs/heads/main/img_res/sippinlean.png', title: 'Sippin Lean (Re-Mixed)', specialLink: true, tracklist: ['Sippin Lean (Re-Mixed) (feat. C0nYe Wong & Trevis Scoot)'] },
         ];
         // ==========================================================
         // --- END EDITABLE ALBUM DATA ---
         // ==========================================================
 
 
+        // --- Element References ---
         const container = document.getElementById('album-container');
         const modal = document.getElementById('album-modal');
         const modalTitle = document.getElementById('modal-title');
@@ -327,12 +346,41 @@
         const modalCover = document.getElementById('modal-cover');
         const spotifyLink = document.getElementById('spotify-link');
         const appleMusicLink = document.getElementById('apple-music-link');
+        const customLink = document.getElementById('custom-link'); // New element reference
         const modalTracklist = document.getElementById('modal-tracklist');
         const tracklistIcon = document.getElementById('tracklist-icon');
+        const logoTrigger = document.getElementById('logo-trigger'); // New element reference
+        const cartiNavItem = document.getElementById('carti-nav-item'); // New element reference
 
+        // --- State ---
         let currentFilter = 'flow'; // Default category
         let imageSources = [];      // Stores [static_cover, gif_url]
         let currentImageIndex = 0;  // 0 for cover, 1 for GIF
+        let logoClickCount = 0;     // Easter Egg counter
+        let easterEggUnlocked = false;
+
+        // --- Easter Egg Logic ---
+        function handleLogoClick() {
+            if (easterEggUnlocked) return;
+
+            logoClickCount++;
+            
+            // Console log for debugging, but not necessary for user experience
+            // console.log(`Logo clicked: ${logoClickCount}`); 
+
+            if (logoClickCount >= LOGO_CLICKS_REQUIRED) {
+                unlockEasterEgg();
+            }
+        }
+
+        function unlockEasterEgg() {
+            if (easterEggUnlocked) return;
+            easterEggUnlocked = true;
+            
+            // Show the hidden navigation tab
+            cartiNavItem.classList.remove('hidden');
+        }
+
 
         // --- Functions ---
 
@@ -395,6 +443,7 @@
 
             // Update Active State on Buttons
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // Include the hidden element when searching for active state
             if(btnElement) btnElement.classList.add('active');
 
             currentFilter = category;
@@ -430,13 +479,38 @@
             
             // 2. Populate Modal Content
             modalTitle.textContent = album.title;
-            modalArtist.textContent = album.artist.toUpperCase() + (album.artist === 'swg' ? ' Group' : '');
+            
+            // --- UPDATED LOGIC to reflect 'Corner$tore Carti' name correctly ---
+            let artistDisplayName = album.artist.toUpperCase();
+            if (album.artist === 'swg') {
+                artistDisplayName = 'SWG Group';
+            } else if (album.artist === 'cornerstore') {
+                artistDisplayName = 'Corner$tore Carti (EE)'; // Using the requested name
+            }
+            modalArtist.textContent = artistDisplayName;
+            // --- END UPDATED LOGIC ---
+            
             modalCover.src = imageSources[currentImageIndex]; // Display the initial cover
             modalCover.alt = album.title;
             updateImageIndicator(); // Set initial indicator text
             
-            spotifyLink.href = album.spotifyUrl;
-            appleMusicLink.href = album.appleMusicUrl;
+            // --- Link Visibility Logic ---
+            if (album.specialLink) {
+                // Show custom link, hide standard links
+                spotifyLink.classList.add('hidden');
+                appleMusicLink.classList.add('hidden');
+                customLink.classList.remove('hidden');
+                customLink.href = EASTER_EGG_LINK;
+            } else {
+                // Show standard links, hide custom link
+                spotifyLink.classList.remove('hidden');
+                appleMusicLink.classList.remove('hidden');
+                customLink.classList.add('hidden');
+                
+                // Populate standard links
+                spotifyLink.href = album.spotifyUrl;
+                appleMusicLink.href = album.appleMusicUrl;
+            }
 
             // Populate Tracklist
             modalTracklist.innerHTML = '';
@@ -499,6 +573,11 @@
             
             // Initial Render
             renderAlbums('flow');
+
+            // Attach Easter Egg listener
+            if (logoTrigger) {
+                logoTrigger.addEventListener('click', handleLogoClick);
+            }
         };
 
     </script>
